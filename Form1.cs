@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Windows.Forms;
 using System.Collections.Generic;
@@ -294,7 +294,7 @@ namespace ДЗ1
             List<double> doubleLines_I = new List<double>();
 
 
-            for (int i = 0; i < 10 && i < stringLines_U.Length; i++)
+            for (int i = 0; i < stringLines_U.Length; i++)
             {
                 string line = stringLines_U[i]; 
 
@@ -311,6 +311,7 @@ namespace ДЗ1
                 }
             }
             Console.WriteLine(doubleLines_U[0].GetType());
+            
 
             for (int i = 0; i < 10 && i < stringLines_I.Length; i++)
             {
@@ -369,9 +370,9 @@ namespace ДЗ1
 
             List<double> doubleLines_U = new List<double>();
             List<double> doubleLines_I = new List<double>();
+            
 
-
-            for (int i = 0; i < 10 && i < stringLines_U.Length; i++)
+            for (int i = 0; i < stringLines_U.Length; i++)
             {
                 string line = stringLines_U[i];
 
@@ -387,32 +388,37 @@ namespace ДЗ1
 
                 }
             }
+            Console.WriteLine(stringLines_U.Length);
+            Console.WriteLine(doubleLines_U.Count);
 
-            for (int i = 0; i < 10 && i < stringLines_I.Length; i++)
+
+            //вычисление P
+            //double[] doubtsP = new double[75];
+            List<double> doubtsP = new List<double>();
+            double p;
+            for (int i = 0; i< doubleLines_U.Count - 1; i+= 800) //800 
             {
-                string line = stringLines_I[i]; 
-
-                string[] parts = line.Split('\t');
-
-                foreach (string part in parts)
+                p = 0;
+                for (int j = 0; j < 800; j++)
                 {
-                    double number;
-                    if (double.TryParse(part, out number))
-                    {
-                        doubleLines_I.Add(number);
-                    }
-
+                    p += doubleLines_U[j] * doubleLines_I[j];
+                    
                 }
+
+                doubtsP.Add( 1 / 800 * p);
             }
 
-            double[] signalData = new double[800];
+
+
+           /* double[] signalData = new double[800];
 
             for (int i = 0; i < signalData.Length; i++)
             {
                 signalData[i] = doubleLines_U[i] * doubleLines_I[i];
             }
 
-            double[] p = new double[800]; 
+
+           // double[] p = new double[800]; 
 
             double dt = 1.0 / 800;
 
@@ -420,7 +426,7 @@ namespace ДЗ1
             for (int i = 1; i < signalData.Length; i++)
             {
                 integral += 0.5 * (signalData[i - 1] + signalData[i]) * dt;
-            }
+            }*/
 
             chart1.Series.Clear();
             Series series = new Series();
@@ -429,10 +435,10 @@ namespace ДЗ1
             series.Name = "P";
             series.Color = Color.Red;
 
-            double secondsPer = 0.00125;
-            for (double i = 0; i < 1; i+= secondsPer)
+            double secondsPer = 1;
+            for (int i = 0; i < doubtsP.Count-1; i++)
             {
-                series.Points.AddXY(i * secondsPer, integral);
+                series.Points.AddXY(i * secondsPer, doubtsP[i]);
             }
             chart1.Series.Add(series);
             
@@ -444,57 +450,12 @@ namespace ДЗ1
 
 
 
-            double integral_U2 = 0;
-
-            for (int i = 0; i < doubleLines_U.Count - 1; i++)
-            {
-                double trapezoidArea = (doubleLines_U[i] * doubleLines_U[i] + doubleLines_U[i + 1] * doubleLines_U[i + 1]) * dt / 2;
-                integral_U2 += trapezoidArea;
-            }
-
-            double sqrtIntegral_U = Math.Sqrt(integral_U2);
 
 
-
-            double integral_I2 = 0;
-
-            for (int i = 0; i < doubleLines_I.Count - 1; i++)
-            {
-                double trapezoidArea = (doubleLines_I[i] * doubleLines_I[i] + doubleLines_I[i + 1] * doubleLines_I[i + 1]) * dt / 2;
-                integral_I2 += trapezoidArea;
-            }
-
-            double sqrtIntegral_I = Math.Sqrt(integral_I2);
+            
 
 
-
-            Series series3 = new Series();
-            series3.ChartType = SeriesChartType.Line;
-
-            series3.Name = "S";
-            series3.Color = Color.Green;
-
-            for (double i = 0; i < 1; i += secondsPer)
-            {
-                series3.Points.AddXY(i * secondsPer, sqrtIntegral_U* sqrtIntegral_I);
-            }
-            chart1.Series.Add(series3);
-            //chart1.Update();
-
-
-
-
-            double q = Math.Sqrt(Math.Pow((sqrtIntegral_U * sqrtIntegral_I), 2) - Math.Pow(integral, 2));
-
-            Series series4 = new Series();
-            series4.ChartType = SeriesChartType.Line;
-            series4.Name = "Q";
-            series4.Color = Color.Purple;
-            for (double i = 0; i < 1; i += secondsPer)
-            {
-                series4.Points.AddXY(i * secondsPer, q);
-            }
-            chart1.Series.Add(series4);
+            
         }
 
 
